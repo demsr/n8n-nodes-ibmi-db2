@@ -367,11 +367,11 @@ export class IbmiDb2 implements INodeType {
 			// ----------------------------------
 			else if (operation === 'update') {
 				const table = this.getNodeParameter('table', 0, '', { extractValue: true }) as string;
-				const updateKey = this.getNodeParameter('updateKey', 0) as string;
+				const updateKeys = (this.getNodeParameter('updateKey', 0) as string).split(',');
 				const columns = (this.getNodeParameter('columns', 0) as string).split(',')
 					.map((column) => column.trim());
-				const updateItems = this.helpers.copyInputItems(this.getInputData(), columns.concat(updateKey));
-				const updateSQL = `UPDATE ${table} SET ${columns.map((c) => `${c}=?`).join(',')} WHERE ${updateKey}=?`;
+				const updateItems = this.helpers.copyInputItems(this.getInputData(), columns.concat(updateKeys));
+				const updateSQL = `UPDATE ${table} SET ${columns.map((c) => `${c}=?`).join(',')} WHERE ${updateKeys.map(u => `${u}=?`).join(" and ")}`;
 
 				const updateData = updateItems.reduce(
 					(collection: IDataObject[], item) =>
